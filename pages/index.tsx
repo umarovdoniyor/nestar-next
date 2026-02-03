@@ -46,3 +46,31 @@ const Home: NextPage = () => {
 };
 
 export default withLayoutMain(Home);
+
+/**
+ * 1. Browser: GET http://localhost:3000/
+       ↓
+2. Next.js: Load pages/index.tsx
+       ↓
+3. withLayoutMain wrapper executes:
+   - Check JWT token
+   - Update user info if logged in
+   - Detect device (mobile/PC)
+       ↓
+4. Render layout:
+   - Top component (header)
+   - FiberContainer (3D bg)
+   - HeaderFilter (search)
+       ↓
+5. Render Home component inside layout:
+   - TrendProperties fetches data
+   - PopularProperties fetches data
+   - TopAgents fetches data
+   - etc.
+       ↓
+6. Bottom components:
+   - Chat (if logged in)
+   - Footer
+       ↓
+7. Page fully rendered
+ */
