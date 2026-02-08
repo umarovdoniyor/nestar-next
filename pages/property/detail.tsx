@@ -27,7 +27,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { GET_PROPERTIES, GET_PROPERTY } from '../../apollo/user/query';
+import { GET_COMMENTS, GET_PROPERTIES, GET_PROPERTY } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
 import { Message } from '../../libs/enums/common.enum';
@@ -96,7 +96,7 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 				sort: 'createdAt',
 				direction: 'DESC',
 				search: {
-					locationList: [property?.propertyLocation || ''],
+					locationList: property?.propertyLocation ? [property?.propertyLocation] : [],
 				},
 			},
 		},
@@ -107,6 +107,22 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 		},
 		onCompleted: (data: T) => {
 			if (data?.getProperties?.list) setDestinationProperties(data?.getProperties?.list);
+		},
+	});
+
+	const {
+		loading: getCommentsLoading,
+		error: getCommentsError,
+		data: getCommentsData,
+		refetch: getCommentsRefetch,
+	} = useQuery(GET_COMMENTS, {
+		fetchPolicy: 'cache-and-network',
+		variables: { input: initialComment },
+		skip: !commentInquiry.search.commentRefId,
+		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			if (data?.getComments?.list) setPropertyComments(data?.getComments?.list);
+			setCommentTotal(data?.getComments?.metaCounter[0]?.total ?? 0);
 		},
 	});
 
@@ -127,7 +143,11 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 		}
 	}, [router]);
 
-	useEffect(() => {}, [commentInquiry]);
+	useEffect(() => {
+		if (commentInquiry.search.commentRefId) {
+			getCommentsRefetch({ input: commentInquiry });
+		}
+	}, [commentInquiry]);
 
 	/** HANDLERS **/
 	const changeImageHandler = (image: string) => {
