@@ -28,7 +28,7 @@ const PropertyBigCard = (props: PropertyBigCardProps) => {
 	};
 
 	if (device === 'mobile') {
-		return <div>APARTMEND BIG CARD</div>;
+		return <div>APARTMENT BIG CARD</div>;
 	} else {
 		return (
 			<Stack className="property-big-card-box" onClick={() => goPropertyDetatilPage(property?._id)}>
@@ -37,10 +37,10 @@ const PropertyBigCard = (props: PropertyBigCardProps) => {
 					className={'card-img'}
 					style={{ backgroundImage: `url(${REACT_APP_API_URL}/${property?.propertyImages?.[0]})` }}
 				>
-					{property?.propertyRank && property?.propertyRank >= topPropertyRank && (
+					{property && property?.propertyRank >= topPropertyRank && (
 						<div className={'status'}>
 							<img src="/img/icons/electricity.svg" alt="" />
-							<span>TOP</span>
+							<span>top</span>
 						</div>
 					)}
 
@@ -66,7 +66,11 @@ const PropertyBigCard = (props: PropertyBigCardProps) => {
 					<Divider sx={{ mt: '15px', mb: '17px' }} />
 					<div className={'bott'}>
 						<div>
-							{property?.propertyRent ? <p>Rent</p> : <span>Rent</span>}
+							{property?.propertyRent ? (
+								<p style={{ marginRight: '5px' }}>Rent</p>
+							) : (
+								<span style={{ marginRight: '5px' }}>Rent</span>
+							)}
 							{property?.propertyBarter ? <p>Barter</p> : <span>Barter</span>}
 						</div>
 						<div className="buttons-box">
@@ -76,7 +80,7 @@ const PropertyBigCard = (props: PropertyBigCardProps) => {
 							<Typography className="view-cnt">{property?.propertyViews}</Typography>
 							<IconButton
 								color={'default'}
-								onClick={(e) => {
+								onClick={(e: any) => {
 									e.stopPropagation();
 									likePropertyHandler(user, property?._id);
 								}}
