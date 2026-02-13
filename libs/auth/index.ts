@@ -37,7 +37,7 @@ export const logIn = async (nick: string, password: string): Promise<void> => {
 		// 3. Handle errors during login process
 		console.warn('login err', err);
 		logOut(); // Clear any existing user data on error
-		throw new Error('Login Err');
+		// throw new Error('Login Err');
 	}
 };
 
@@ -97,7 +97,7 @@ export const signUp = async (nick: string, password: string, phone: string, type
 		// 3. Handle errors during signup process
 		console.warn('login err', err);
 		logOut(); // Clear any existing user data on error
-		throw new Error('Login Err');
+		// throw new Error('Login Err');
 	}
 };
 
