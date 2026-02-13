@@ -84,6 +84,40 @@ function createIsomorphicLink() {
 			 */
 		});
 
+		// Custome WebSocket client 
+		class LoggingWebSocket{
+			private socket: WebSocket;
+			constructor(url: string){
+
+				this.socket = new WebSocket(url);
+
+				this.socket.onopen = () => {
+					console.log('WebSocket connection opened');
+				};
+
+				this.socket.onmessage = (msg)=>{
+					console.log('WebSocket message received:', msg.data);
+				}
+
+				this.socket.onerror = (err)=>{
+					console.error('WebSocket error:', err);
+				}
+
+				this.socket.onclose = (event)=>{
+					console.log('WebSocket connection closed:', event);
+				}
+			}
+
+			send(data: any){
+				this.socket.send(data);
+			}
+
+			close(){
+				this.socket.close();
+			}
+				
+		}
+
 		/* WEBSOCKET SUBSCRIPTION LINK */
 		const wsLink = new WebSocketLink({
 			uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
@@ -94,6 +128,7 @@ function createIsomorphicLink() {
 					return { headers: getHeaders() };
 				},
 			},
+			webSocketImpl: LoggingWebSocket,
 		});
 
 		// Purpose: Catch and handle errors from all GraphQL requests
