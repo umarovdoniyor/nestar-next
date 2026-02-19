@@ -7,6 +7,7 @@ import { onError } from '@apollo/client/link/error';
 import { getJwtToken, logOut } from '../libs/auth';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
 import { sweetErrorAlert } from '../libs/sweetAlert';
+import { socketVar } from './store';
 
 // Singleton Apollo Client instance
 let apolloClient: ApolloClient<NormalizedCacheObject>;
@@ -42,6 +43,39 @@ const tokenRefreshLink = new TokenRefreshLink({
 		return null;
 	},
 });
+
+// Custome WebSocket client
+class LoggingWebSocket {
+	private socket: WebSocket;
+	constructor(url: string) {
+		this.socket = new WebSocket(`${url}?token=${getJwtToken()}`);
+		socketVar(this.socket);
+
+		this.socket.onopen = () => {
+			console.log('WebSocket connection opened');
+		};
+
+		this.socket.onmessage = (msg) => {
+			console.log('WebSocket message received:', msg.data);
+		};
+
+		this.socket.onerror = (err) => {
+			console.error('WebSocket error:', err);
+		};
+
+		this.socket.onclose = (event) => {
+			console.log('WebSocket connection closed:', event);
+		};
+	}
+
+	send(data: any) {
+		this.socket.send(data);
+	}
+
+	close() {
+		this.socket.close();
+	}
+}
 
 /** =============== createIsomorphicLink ===============*/
 /** Purpose: Create appropriate link chain for client or server environment */
@@ -83,40 +117,6 @@ function createIsomorphicLink() {
 			 * Used for: Uploading property images, user avatars
 			 */
 		});
-
-		// Custome WebSocket client 
-		class LoggingWebSocket{
-			private socket: WebSocket;
-			constructor(url: string){
-
-				this.socket = new WebSocket(url);
-
-				this.socket.onopen = () => {
-					console.log('WebSocket connection opened');
-				};
-
-				this.socket.onmessage = (msg)=>{
-					console.log('WebSocket message received:', msg.data);
-				}
-
-				this.socket.onerror = (err)=>{
-					console.error('WebSocket error:', err);
-				}
-
-				this.socket.onclose = (event)=>{
-					console.log('WebSocket connection closed:', event);
-				}
-			}
-
-			send(data: any){
-				this.socket.send(data);
-			}
-
-			close(){
-				this.socket.close();
-			}
-				
-		}
 
 		/* WEBSOCKET SUBSCRIPTION LINK */
 		const wsLink = new WebSocketLink({

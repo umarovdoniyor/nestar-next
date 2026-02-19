@@ -85,6 +85,7 @@ const Chat = () => {
 			}
 		};
 	}, [socket]);
+
 	useEffect(() => {
 		const timeoutId = setTimeout(() => {
 			setOpenButton(true);
